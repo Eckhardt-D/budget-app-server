@@ -49,21 +49,33 @@ router.post('/', (req, res) => {
     let id = results[1]._id;
     let current = results[1].total;
 
-    await Category.findByIdAndUpdate(id, { total: current + amount });
+    await Category.findByIdAndUpdate(id, { total: parseFloat(current) + parseFloat(amount) });
     return res.json(results[0]);
 
   })
-  .catch(() => res.sendStatus(500));
+  .catch(e => res.sendStatus(500));
 
 });
 
 // Edit expense
-router.put('/', (req, res) => {
+router.put('/:id', async (req, res) => {
   
-  Expense
-  .findByIdAndUpdate(req.body._id, req.body)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
+  try {
+
+    const expense    = await Expense.findById(req.params.id);
+    const update     = await Expense.findByIdAndUpdate(req.params.id, req.body);
+    const difference = parseFloat(expense.amount) - parseFloat(req.body.amount);
+    const category   = await Category.findOne({ name: expense.category });
+    const newTotal   = parseFloat(category.total) - difference;
+    
+    await Category.findOneAndUpdate({ name: expense.category }, { total: newTotal });
+    return res.status(200).send({msg: 'Succesfully updated expense and related category'});
+
+  } catch(e) {
+
+    res.status(500).send(e)
+
+  }
 
 });
 

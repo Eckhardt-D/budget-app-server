@@ -9,15 +9,11 @@ module.exports = function (req, res, next) {
   if(!authHeader) return res.status(401).send('unauth');
   
   //get token value
-  jwt.verify(authHeader, 'onetwothreefour', (err, decode) => {
-    
-    if(err) return res.status(500);
-    token = decode;
+  token = jwt.verify(authHeader, 'onetwothreefour');
+  
+  // check if token matches user
+  Admin.findById(token.id)
+  .then(() => next())
+  .catch(() => res.status(401).send('unauthorized'));
 
-    // check if token matches user
-    Admin.findById(token.id)
-    .then(() => next())
-    .catch(() => res.status(401).send('unauthorized'));
-
-  });
 }

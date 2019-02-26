@@ -24,11 +24,18 @@ router.get('/:id', (req, res) => {
 
 // Create new budget
 router.post('/', (req, res) => {
-  
-  Budget
-  .create(req.body)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
+
+  // Only one budget should exist
+  Budget.deleteMany({}).then(() => {
+
+    // Overwrite
+    Budget
+    .create(req.body)
+    .then(result => res.json(result))
+    .catch(() => res.sendStatus(500));
+
+  })
+  .catch(e => res.status(500).send('Error overwriting'));
 
 });
 
