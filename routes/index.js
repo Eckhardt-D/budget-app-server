@@ -7,12 +7,11 @@ const Admin = require('../database/Admin');
 
 router.post('/', (req, res) => {
   const password = req.body.password;
-  const salt = bcrypt.genSaltSync(5);
-  const hashedPassword = bcrypt.hashSync(password, salt);
 
   // Find the only user in the database
-  Admin.findOne({ username: 'Eckhardt' })
+  Admin.findOne({ username: req.body.username })
   .then(result => {
+    const hashedPassword = result.password;
 
     // Unauthorized if wrong password
     if(!bcrypt.compareSync(password, hashedPassword)) return res.status(401).send({ auth: false, token: null});
@@ -23,7 +22,8 @@ router.post('/', (req, res) => {
     // Send result
     res.status(200).send({auth: true, token});
 
-  });
+  })
+  .catch(() => res.status(401).send('Unauthorized'));
 });
 
 module.exports = router;

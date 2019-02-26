@@ -63,11 +63,11 @@ router.put('/:id', async (req, res) => {
   try {
 
     const expense    = await Expense.findById(req.params.id);
-    const update     = await Expense.findByIdAndUpdate(req.params.id, req.body);
     const difference = parseFloat(expense.amount) - parseFloat(req.body.amount);
     const category   = await Category.findOne({ name: expense.category });
     const newTotal   = parseFloat(category.total) - difference;
     
+    await Expense.findByIdAndUpdate(req.params.id, req.body);
     await Category.findOneAndUpdate({ name: expense.category }, { total: newTotal });
     return res.status(200).send({msg: 'Succesfully updated expense and related category'});
 
@@ -80,12 +80,22 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete expense
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
 
-  Expense
-  .findByIdAndDelete(req.body._id)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
+  try {
+
+    const expense    = await Expense.findByIdAndDelete(req.params.id);
+    const category   = await Category.findOne({ name: expense.category });
+    const newTotal   = parseFloat(category.total) - parseFloat(expense.amount)
+    
+    await Category.findOneAndUpdate({ name: expense.category }, { total: newTotal });
+    return res.status(200).send({msg: 'Succesfully deleted expense and updated related category'});
+
+  } catch(e) {
+
+    res.status(500).send(e)
+
+  }
 
 });
 
