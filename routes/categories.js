@@ -22,7 +22,7 @@ router.get('/:id', (req, res) => {
 
 });
 
-// Create new category
+// Create new category (Currently only internal)
 router.post('/', (req, res) => {
 
   Category
@@ -42,7 +42,7 @@ router.put('/:id', (req, res) => {
 
 });
 
-// Delete category
+// Delete category (Currently only internal)
 router.delete('/:id', (req, res) => {
   
   Category

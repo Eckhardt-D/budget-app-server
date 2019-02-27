@@ -14,7 +14,8 @@ router.post('/', (req, res) => {
     const hashedPassword = result.password;
 
     // Unauthorized if wrong password
-    if(!bcrypt.compareSync(password, hashedPassword)) return res.status(401).send({ auth: false, token: null});
+    if(!bcrypt.compareSync(password, hashedPassword)) 
+      return res.status(401).send({ auth: false, token: null});
     
     // Sign the token
     const token = jwt.sign({ id: result._id }, 'onetwothreefour', { expiresIn: 86400 });

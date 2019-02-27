@@ -12,52 +12,21 @@ router.get('/', (req, res) => {
 
 });
 
-// Get budget by id and type
-router.get('/:id', (req, res) => {
-  
-  Budget
-  .findById(req.params.id)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
-  
-});
-
 // Create new budget
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
 
-  // Only one budget should exist
-  Budget.deleteMany({}).then(() => {
+  try {
 
-    // Overwrite
-    Budget
-    .create(req.body)
-    .then(result => res.json(result))
-    .catch(() => res.sendStatus(500));
+    await Budget.deleteMany({});
+    return await Budget.create(req.body);
 
-  })
-  .catch(e => res.status(500).send('Error overwriting'));
+  } catch(error) {
 
-});
+    return res.status(500)
+    .send({msg: 'error updating budget'});
 
-// Edit budget
-router.put('/:id', (req, res) => {
-  
-  Budget
-  .findByIdAndUpdate(req.params.id, req.body)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
+  }
 
 });
-
-// Delete Budget
-router.delete('/:id', (req, res) => {
-  
-  Budget
-  .findByIdAndDelete(req.params.id)
-  .then(result => res.json(result))
-  .catch(() => res.sendStatus(500));
-
-});
-
 
 module.exports = router
